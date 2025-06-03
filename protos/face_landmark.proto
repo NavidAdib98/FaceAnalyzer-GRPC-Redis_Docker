@@ -1,0 +1,15 @@
+syntax = "proto3";
+package ai;
+
+service FaceLandmarkService {
+  rpc DetectLandmarks (FaceImageRequest) returns (LandmarkResponse) {}
+}
+
+message FaceImageRequest {
+  string filename = 1;
+  bytes  image_data = 2;
+}
+
+message LandmarkResponse {
+  bool success = 1;
+}

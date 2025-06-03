@@ -1,0 +1,17 @@
+# Virtual environment
+/face_detection_venv
+
+# docx
+for *.docx
+
+# VSCode settings (optional)
+.vscode/
+
+# Python bytecode
+__pycache__/
+
+# OS files
+.DS_Store
+
+# Logs and cache
+*.log

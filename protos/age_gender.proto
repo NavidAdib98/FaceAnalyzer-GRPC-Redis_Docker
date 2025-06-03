@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ai;
+
+service AgeGenderService {
+  rpc Estimate (AgeImageRequest) returns (AgeGenderResponse) {}
+}
+
+message AgeImageRequest {
+  string filename = 1;
+  bytes  image_data = 2;
+}
+
+message AgeGenderResponse {
+  bool success = 1;
+  int32 estimated_age = 2;
+  string gender = 3;
+}

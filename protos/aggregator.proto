@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package ai;
+
+service Aggregator {
+    rpc SaveFaceAttributes (FaceResult) returns (FaceResultResponse) {}
+}
+
+message FaceResult {
+    string time = 1;
+    bytes  frame = 2; // Send image data in JPEG format
+    string redis_key = 3;
+}
+
+message FaceResultResponse {
+    bool response = 1;
+}
