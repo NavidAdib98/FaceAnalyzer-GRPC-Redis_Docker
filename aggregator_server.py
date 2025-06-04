@@ -3,14 +3,50 @@
 import grpc
 from concurrent import futures
 import time
+import os
+import json
+from datetime import datetime
+import redis
+
+
 from generated import aggregator_pb2, aggregator_pb2_grpc
+from utils import get_from_redis
+
+# Create output directory
+OUTPUT_DIR = "output"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
 class AggregatorServicer(aggregator_pb2_grpc.AggregatorServicer):
 
     def SaveFaceAttributes(self, request, context):
-        print(f"[{request.time}] Received frame with redis_key: {request.redis_key}")
-        
+        redis_key = request.redis_key
+        image_data = request.frame
+        redis_time = request.time
+
+        # Retrieve data from Redis
+        data = get_from_redis(redis_key)
+        if not data:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(f"No data found in Redis for key: {redis_key}")
+            return aggregator_pb2.FaceResultResponse(response=False)
+
+        # Generate filename
+        safe_time = redis_time.replace(":", "_").replace("/", "_") if redis_time else datetime.now().strftime('%Y%m%d_%H%M%S')
+        base_filename = f"{safe_time}_{redis_key}"
+
+        # Save image
+        image_path = os.path.join(OUTPUT_DIR, base_filename + ".jpg")
+        with open(image_path, 'wb') as f:
+            f.write(image_data)
+
+        # Save JSON
+        json_path = os.path.join(OUTPUT_DIR, base_filename + ".json")
+        with open(json_path, 'w') as f:
+            json.dump(data, f, indent=2)
+
+
+        print(f"Saved image and data for {redis_key} at {safe_time}")
         return aggregator_pb2.FaceResultResponse(response=True)
 
 
