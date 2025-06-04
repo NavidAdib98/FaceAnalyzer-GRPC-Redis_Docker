@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import aggregator_pb2 as aggregator__pb2
+from generated import aggregator_pb2 as aggregator__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__

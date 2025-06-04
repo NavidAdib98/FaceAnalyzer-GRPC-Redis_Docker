@@ -1,19 +1,38 @@
 import grpc
+import json
 from concurrent import futures
 import time
 
 # Import generated classes
-from generated import age_gender_pb2, age_gender_pb2_grpc
+from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggregator_pb2_grpc
+from utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
+
 
 
 class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
-    def Estimate(self, request, context):
-        print(f"Received request for file: {request.filename}")
-        print("image is in progress with age/gender prediction")
+    def __init__(self):
+        channel = grpc.insecure_channel('localhost:50054')  # Aggregator
+        self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
 
-        # فقط یک پاسخ تستی بازمی‌گردانیم
-        return age_gender_pb2.AgeGenderResponse(estimated_age=25, gender="Male", success=True)
+    def Estimate(self, request, context):
+        image_hash = compute_image_hash(request.image_data)
+        print(f"Processing age/gender for {request.filename}, hash={image_hash}")
+
+        result = json.dumps({"age": 25, "gender": "male"})  # Fake data
+        save_to_redis(image_hash, 'age_gender', result)
+
+        if is_complete(image_hash):
+            print("[Age_Gender_Server]:  Both landmarks and age/gender available. Sending to Aggregator.")
+            self.aggregator_stub.SaveFaceAttributes(
+                aggregator_pb2.FaceResult(
+                    time=request.filename,
+                    frame=request.image_data,
+                    redis_key=image_hash
+                )
+            )
+
+        return age_gender_pb2.AgeGenderResponse(estimated_age=25, gender="male", success=True)
 
 
 def serve():
