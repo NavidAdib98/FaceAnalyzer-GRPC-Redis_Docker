@@ -15,13 +15,15 @@ from utils.logger.grpc_interceptors import LoggingInterceptor
 from config_loader import config
 config_grpc2_port = config['grpc']["service2"]['port']
 config_grpc4_port = config['grpc']["service4"]['port']
+config_grpc2_host = config['grpc']["service2"]['host']
+config_grpc4_host = config['grpc']["service4"]['host']
 config_output_dir = config["output"]["dir"]
 # ------- ------------ ---------
 
 class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServicer):
 
     def __init__(self):
-            channel = grpc.insecure_channel(f'localhost:{config_grpc4_port}')  # Aggregator
+            channel = grpc.insecure_channel(f'{config_grpc4_host}:{config_grpc4_port}')  # Aggregator
             self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
             
     def DetectLandmarks(self, request, context):
@@ -54,7 +56,7 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     face_landmark_pb2_grpc.add_FaceLandmarkServiceServicer_to_server(FaceLandmarkServiceServicer(), server)
-    server.add_insecure_port(f"[::]:{config_grpc2_port}")  # listening to port 50052 
+    server.add_insecure_port(f"{config_grpc2_host}:{config_grpc2_port}")  # listening to port 50052 
     print(f"Face Landmark Service running on port {config_grpc2_port}...")
     server.start()
     try:

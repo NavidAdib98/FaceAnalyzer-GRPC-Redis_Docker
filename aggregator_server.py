@@ -17,9 +17,8 @@ from utils.logger.grpc_interceptors import LoggingInterceptor
 
 # ------- config.yaml ---------
 from config_loader import config
-service_name = "service4"
-config_grpc_host = config['grpc'][service_name]['host']
-config_grpc_port = config['grpc'][service_name]['port']
+config_grpc_host = config['grpc']["service4"]['host']
+config_grpc_port = config['grpc']["service4"]['port']
 config_output_dir = config["output"]["dir"]
 # ------- ------------ ---------
 
@@ -72,7 +71,7 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     aggregator_pb2_grpc.add_AggregatorServicer_to_server(AggregatorServicer(), server)
-    server.add_insecure_port(f"[::]:{config_grpc_port}")  # listening to port 50054 
+    server.add_insecure_port(f"{config_grpc_host}:{config_grpc_port}")  # listening to port 50054 
     print(f"Starting Aggregator server on port {config_grpc_port}...")
     server.start()
     try:

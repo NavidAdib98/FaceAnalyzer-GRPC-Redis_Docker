@@ -3,7 +3,14 @@ import hashlib
 import redis
 import json
 
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+# ------- config.yaml ---------
+from config_loader import config
+config_redis_port = config['redis']['port']
+config_redis_host = config['redis']['host']
+config_redis_db = config['redis']['db']
+# ------- ------------ ---------
+
+redis_client = redis.Redis(host=config_redis_host, port=config_redis_port, db=config_redis_db)
 
 def compute_image_hash(image_data: bytes) -> str:
     return hashlib.sha256(image_data).hexdigest()

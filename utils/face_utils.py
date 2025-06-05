@@ -38,7 +38,7 @@ def detect_faces(image_bytes):
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 @log_action_time("[Age Prediction]:")
-def predict_age_gender_with_padding(image, faces, padding_ratio=0.4):
+def predict_age_gender_with_padding(image, faces, padding_ratio=0.35):
     """
     Predicts age and gender for each detected face with padding applied.
 

@@ -18,6 +18,8 @@ from utils.logger.grpc_interceptors import LoggingInterceptor
 from config_loader import config
 config_grpc3_port = config['grpc']["service3"]['port']
 config_grpc4_port = config['grpc']["service4"]['port']
+config_grpc3_host = config['grpc']["service3"]['host']
+config_grpc4_host = config['grpc']["service4"]['host']
 config_output_dir = config["output"]["dir"]
 # ------- ------------ ---------
 
@@ -25,7 +27,7 @@ config_output_dir = config["output"]["dir"]
 class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
     def __init__(self):
-        channel = grpc.insecure_channel(f'localhost:{config_grpc4_port}')  # Aggregator
+        channel = grpc.insecure_channel(f'{config_grpc4_host}:{config_grpc4_port}')  # Aggregator
         self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
 
     def Estimate(self, request, context):
@@ -96,7 +98,7 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     age_gender_pb2_grpc.add_AgeGenderServiceServicer_to_server(AgeGenderServiceServicer(), server)
-    server.add_insecure_port(f"[::]:{config_grpc3_port}")  # listening to port 50053
+    server.add_insecure_port(f"{config_grpc3_host}:{config_grpc3_port}")  # listening to port 50053
     print(f'Starting AgeGenderService server on port {config_grpc3_port}...')
     server.start()
     try:
