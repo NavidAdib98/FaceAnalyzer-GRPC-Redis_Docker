@@ -1,10 +1,14 @@
 import grpc
 from concurrent import futures
 import time
+import json
 
 # Import generated classes
 from generated import face_landmark_pb2, face_landmark_pb2_grpc,aggregator_pb2,aggregator_pb2_grpc
-from utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
+from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
+
+# face_landmark_server.py
+from utils.face_utils import detect_faces,extract_landmarks
 
 
 class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServicer):
@@ -17,8 +21,14 @@ class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServ
         image_hash = compute_image_hash(request.image_data)
         print(f"Processing face landmarks for {request.filename}, hash={image_hash}")
 
-        landmarks_result = '{"points": [[1,2],[3,4]]}'  # Fake data
-        save_to_redis(image_hash, 'landmarks', landmarks_result)
+        [faces, gray_frame] = detect_faces(request.image_data)
+        landmarks_result = extract_landmarks(gray_frame,faces)
+
+        if landmarks_result is None:
+            print("[Landmark Service] No face detected.")
+            return face_landmark_pb2.LandmarkResponse(success=False)
+
+        save_to_redis(image_hash, 'landmarks', json.dumps(landmarks_result))
 
         if is_complete(image_hash):
             print("[Face_landmark_Server]:  Both age/gender and landmarks are ready. Sending to Aggregator.")

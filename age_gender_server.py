@@ -5,7 +5,7 @@ import time
 
 # Import generated classes
 from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggregator_pb2_grpc
-from utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
+from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
 
 
 

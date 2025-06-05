@@ -7,10 +7,12 @@ import os
 import json
 from datetime import datetime
 import redis
+import cv2
 
 
 from generated import aggregator_pb2, aggregator_pb2_grpc
-from utils import get_from_redis
+from utils.utils import get_from_redis
+from utils.face_utils import draw_landmarks_on_image
 
 # Create output directory
 OUTPUT_DIR = "output"
@@ -35,10 +37,11 @@ class AggregatorServicer(aggregator_pb2_grpc.AggregatorServicer):
         safe_time = redis_time.replace(":", "_").replace("/", "_") if redis_time else datetime.now().strftime('%Y%m%d_%H%M%S')
         base_filename = f"{safe_time}_{redis_key}"
 
+        # draw landmarks on image before saving
+        landmarked_image = draw_landmarks_on_image(image_data, data["landmarks"])
         # Save image
         image_path = os.path.join(OUTPUT_DIR, base_filename + ".jpg")
-        with open(image_path, 'wb') as f:
-            f.write(image_data)
+        cv2.imwrite(image_path, landmarked_image)
 
         # Save JSON
         json_path = os.path.join(OUTPUT_DIR, base_filename + ".json")
