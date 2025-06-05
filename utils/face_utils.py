@@ -3,6 +3,9 @@ import cv2
 import json
 import numpy as np
 
+# log
+from utils.logger.logging_utils import log_action_time
+
 # Load models once globally
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('./models/shape_predictor_68_face_landmarks.dat')
@@ -15,6 +18,7 @@ GENDER_LIST = ['Male', 'Female']
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
+@log_action_time("[Face Detection]:")
 def detect_faces(image_bytes):
     """
     Detects faces in the given image.
@@ -33,6 +37,7 @@ def detect_faces(image_bytes):
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
+@log_action_time("[Age Prediction]:")
 def predict_age_gender_with_padding(image, faces, padding_ratio=0.4):
     """
     Predicts age and gender for each detected face with padding applied.
@@ -91,6 +96,7 @@ def predict_age_gender_with_padding(image, faces, padding_ratio=0.4):
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
+@log_action_time("[Extract Landmarks]:")
 def extract_landmarks(gray_image, faces):
     """
     Extracts 68 facial landmarks for each detected face.
@@ -116,6 +122,7 @@ def extract_landmarks(gray_image, faces):
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
+@log_action_time("[Draw Landmarks]:")
 def draw_landmarks_on_image(image_bytes, landmarks_json):
     """
     Draw landmarks on the given image.
@@ -151,7 +158,7 @@ def draw_landmarks_on_image(image_bytes, landmarks_json):
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
-
+@log_action_time("[Draw Landmarks and annotate age-gender]:")
 def draw_combined_annotations(image_bytes, combined_json):
     """
     Draws both facial landmarks and age-gender annotations on the image.

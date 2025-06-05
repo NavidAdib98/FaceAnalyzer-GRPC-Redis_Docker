@@ -7,8 +7,10 @@ import json
 from generated import face_landmark_pb2, face_landmark_pb2_grpc,aggregator_pb2,aggregator_pb2_grpc
 from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
 
-# face_landmark_server.py
+# Import utils
 from utils.face_utils import detect_faces,extract_landmarks
+from utils.logger.grpc_interceptors import LoggingInterceptor
+
 
 
 class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServicer):
@@ -43,7 +45,9 @@ class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServ
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),
+                         interceptors=[LoggingInterceptor()]
+                         )
     face_landmark_pb2_grpc.add_FaceLandmarkServiceServicer_to_server(FaceLandmarkServiceServicer(), server)
     server.add_insecure_port('[::]:50052')
     print("Face Landmark Service running on port 50052...")
