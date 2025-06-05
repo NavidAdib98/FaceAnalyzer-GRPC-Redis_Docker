@@ -152,3 +152,55 @@ def draw_landmarks_on_image(image_bytes, landmarks_json):
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 
+def draw_combined_annotations(image_bytes, combined_json):
+    """
+    Draws both facial landmarks and age-gender annotations on the image.
+
+    Args:
+        image_bytes (bytes): Input image in bytes.
+        combined_json (str or dict): JSON string or parsed dict with:
+            {
+                "landmarks": [ [ [x,y], ..., [x,y] ], ... ],
+                "age_gender": [ { "age": str, "gender": str, "box": [x1,y1,x2,y2] }, ... ]
+            }
+
+    Returns:
+        np.ndarray: Annotated image (BGR format).
+    """
+    # Decode image
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if image is None:
+        raise ValueError("Failed to decode image bytes.")
+
+    # Parse JSON if it's a string
+    if isinstance(combined_json, str):
+        combined_data = json.loads(combined_json)
+    else:
+        combined_data = combined_json
+
+    landmarks_list = combined_data.get("landmarks", [])
+    age_gender_list = combined_data.get("age_gender", [])
+
+    # Ensure both lists are of the same length
+    if len(landmarks_list) != len(age_gender_list):
+        raise ValueError("Mismatch: 'landmarks' and 'age_gender' must have the same number of entries.")
+
+    for i in range(len(landmarks_list)):
+        # Draw landmarks
+        for (x, y) in landmarks_list[i]:
+            cv2.circle(image, (int(x), int(y)), radius=2, color=(0, 255, 0), thickness=-1)
+
+        # Draw age-gender and box
+        age = age_gender_list[i].get("age", "?")
+        gender = age_gender_list[i].get("gender", "?")
+        box = age_gender_list[i].get("box", [0, 0, 0, 0])
+        x1, y1, x2, y2 = map(int, box)
+
+        label = f"{gender}, {age}"
+        cv2.rectangle(image, (x1, y1), (x2, y2), color=(0, 255, 255), thickness=2)
+        cv2.putText(image, label, (x1, y1 - 10), 
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.7,
+                    color=(0, 255, 0), thickness=2)
+
+    return image

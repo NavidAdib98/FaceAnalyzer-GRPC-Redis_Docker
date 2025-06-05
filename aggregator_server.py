@@ -12,7 +12,7 @@ import cv2
 
 from generated import aggregator_pb2, aggregator_pb2_grpc
 from utils.utils import get_from_redis
-from utils.face_utils import draw_landmarks_on_image
+from utils.face_utils import draw_landmarks_on_image,draw_combined_annotations
 
 # Create output directory
 OUTPUT_DIR = "output"
@@ -37,11 +37,15 @@ class AggregatorServicer(aggregator_pb2_grpc.AggregatorServicer):
         safe_time = redis_time.replace(":", "_").replace("/", "_") if redis_time else datetime.now().strftime('%Y%m%d_%H%M%S')
         base_filename = f"{safe_time}_{redis_key}"
 
-        # draw landmarks on image before saving
-        landmarked_image = draw_landmarks_on_image(image_data, data["landmarks"])
+        # draw landmarks and (age-gender) annotation on image before saving
+        # print(data)
+        data['landmarks'] = json.loads(data['landmarks'])
+        data['age_gender'] = json.loads(data['age_gender'])
+        final_image = draw_combined_annotations(image_data, data)
+        
         # Save image
         image_path = os.path.join(OUTPUT_DIR, base_filename + ".jpg")
-        cv2.imwrite(image_path, landmarked_image)
+        cv2.imwrite(image_path, final_image)
 
         # Save JSON
         json_path = os.path.join(OUTPUT_DIR, base_filename + ".json")
