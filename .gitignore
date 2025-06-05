@@ -2,7 +2,7 @@
 /face_detection_venv
 
 # docx
-for *.docx
+*.docx
 
 # VSCode settings (optional)
 .vscode/
