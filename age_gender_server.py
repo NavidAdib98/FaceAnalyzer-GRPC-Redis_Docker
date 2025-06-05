@@ -5,16 +5,27 @@ import time
 
 # Import generated classes
 from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggregator_pb2_grpc
-from utils.utils import compute_image_hash, save_to_redis, is_complete, redis_client
-# face_landmark_server.py
-from utils.face_utils import detect_faces,predict_age_gender_with_padding
 
+# import utils
+from utils.utils import compute_image_hash, save_to_redis, is_complete, redis_client
+from utils.face_utils import detect_faces,predict_age_gender_with_padding
+from utils.logger.grpc_interceptors import LoggingInterceptor
+
+
+
+
+# ------- config.yaml ---------
+from config_loader import config
+config_grpc3_port = config['grpc']["service3"]['port']
+config_grpc4_port = config['grpc']["service4"]['port']
+config_output_dir = config["output"]["dir"]
+# ------- ------------ ---------
 
 
 class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
     def __init__(self):
-        channel = grpc.insecure_channel('localhost:50054')  # Aggregator
+        channel = grpc.insecure_channel(f'localhost:{config_grpc4_port}')  # Aggregator
         self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
 
     def Estimate(self, request, context):
@@ -81,10 +92,12 @@ class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),
+                         interceptors=[LoggingInterceptor()]
+                         )
     age_gender_pb2_grpc.add_AgeGenderServiceServicer_to_server(AgeGenderServiceServicer(), server)
-    server.add_insecure_port('[::]:50053')  # listening on port 50053
-    print("Starting AgeGenderService server on port 50053...")
+    server.add_insecure_port(f"[::]:{config_grpc3_port}")  # listening to port 50053
+    print(f'Starting AgeGenderService server on port {config_grpc3_port}...')
     server.start()
     try:
         while True:

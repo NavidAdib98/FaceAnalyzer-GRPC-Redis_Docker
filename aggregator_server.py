@@ -12,10 +12,20 @@ import cv2
 
 from generated import aggregator_pb2, aggregator_pb2_grpc
 from utils.utils import get_from_redis
-from utils.face_utils import draw_landmarks_on_image,draw_combined_annotations
+from utils.face_utils import draw_combined_annotations
+from utils.logger.grpc_interceptors import LoggingInterceptor
+
+# ------- config.yaml ---------
+from config_loader import config
+service_name = "service4"
+config_grpc_host = config['grpc'][service_name]['host']
+config_grpc_port = config['grpc'][service_name]['port']
+config_output_dir = config["output"]["dir"]
+# ------- ------------ ---------
+
 
 # Create output directory
-OUTPUT_DIR = "output"
+OUTPUT_DIR = config_output_dir
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -58,10 +68,12 @@ class AggregatorServicer(aggregator_pb2_grpc.AggregatorServicer):
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10),
+                         interceptors=[LoggingInterceptor()]
+                         )
     aggregator_pb2_grpc.add_AggregatorServicer_to_server(AggregatorServicer(), server)
-    server.add_insecure_port('[::]:50054')  # listening to port 50054 
-    print("Starting Aggregator server on port 50054...")
+    server.add_insecure_port(f"[::]:{config_grpc_port}")  # listening to port 50054 
+    print(f"Starting Aggregator server on port {config_grpc_port}...")
     server.start()
     try:
         while True:
