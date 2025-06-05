@@ -7,11 +7,23 @@ service AgeGenderService {
 
 message AgeImageRequest {
   string filename = 1;
-  bytes  image_data = 2;
+  bytes image_data = 2;
+}
+
+message FaceAttributes {
+  string estimated_age = 1;  // تغییر به رشته برای پشتیبانی از "20-30"
+  string gender = 2;
+  BoundingBox box = 3;
+}
+
+message BoundingBox {
+  int32 x1 = 1;
+  int32 y1 = 2;
+  int32 x2 = 3;
+  int32 y2 = 4;
 }
 
 message AgeGenderResponse {
   bool success = 1;
-  int32 estimated_age = 2;
-  string gender = 3;
+  repeated FaceAttributes faces = 2;
 }

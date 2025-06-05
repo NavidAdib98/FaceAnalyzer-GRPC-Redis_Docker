@@ -21,7 +21,7 @@ class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServ
         image_hash = compute_image_hash(request.image_data)
         print(f"Processing face landmarks for {request.filename}, hash={image_hash}")
 
-        [faces, gray_frame] = detect_faces(request.image_data)
+        [faces, gray_frame,color_image] = detect_faces(request.image_data)
         landmarks_result = extract_landmarks(gray_frame,faces)
 
         if landmarks_result is None:

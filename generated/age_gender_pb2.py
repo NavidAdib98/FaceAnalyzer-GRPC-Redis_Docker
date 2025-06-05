@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61ge_gender.proto\x12\x02\x61i\"7\n\x0f\x41geImageRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\"K\n\x11\x41geGenderResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x15\n\restimated_age\x18\x02 \x01(\x05\x12\x0e\n\x06gender\x18\x03 \x01(\t2L\n\x10\x41geGenderService\x12\x38\n\x08\x45stimate\x12\x13.ai.AgeImageRequest\x1a\x15.ai.AgeGenderResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10\x61ge_gender.proto\x12\x02\x61i\"7\n\x0f\x41geImageRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\"U\n\x0e\x46\x61\x63\x65\x41ttributes\x12\x15\n\restimated_age\x18\x01 \x01(\t\x12\x0e\n\x06gender\x18\x02 \x01(\t\x12\x1c\n\x03\x62ox\x18\x03 \x01(\x0b\x32\x0f.ai.BoundingBox\"=\n\x0b\x42oundingBox\x12\n\n\x02x1\x18\x01 \x01(\x05\x12\n\n\x02y1\x18\x02 \x01(\x05\x12\n\n\x02x2\x18\x03 \x01(\x05\x12\n\n\x02y2\x18\x04 \x01(\x05\"G\n\x11\x41geGenderResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12!\n\x05\x66\x61\x63\x65s\x18\x02 \x03(\x0b\x32\x12.ai.FaceAttributes2L\n\x10\x41geGenderService\x12\x38\n\x08\x45stimate\x12\x13.ai.AgeImageRequest\x1a\x15.ai.AgeGenderResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,8 +33,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_AGEIMAGEREQUEST']._serialized_start=24
   _globals['_AGEIMAGEREQUEST']._serialized_end=79
-  _globals['_AGEGENDERRESPONSE']._serialized_start=81
-  _globals['_AGEGENDERRESPONSE']._serialized_end=156
-  _globals['_AGEGENDERSERVICE']._serialized_start=158
-  _globals['_AGEGENDERSERVICE']._serialized_end=234
+  _globals['_FACEATTRIBUTES']._serialized_start=81
+  _globals['_FACEATTRIBUTES']._serialized_end=166
+  _globals['_BOUNDINGBOX']._serialized_start=168
+  _globals['_BOUNDINGBOX']._serialized_end=229
+  _globals['_AGEGENDERRESPONSE']._serialized_start=231
+  _globals['_AGEGENDERRESPONSE']._serialized_end=302
+  _globals['_AGEGENDERSERVICE']._serialized_start=304
+  _globals['_AGEGENDERSERVICE']._serialized_end=380
 # @@protoc_insertion_point(module_scope)

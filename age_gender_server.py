@@ -5,7 +5,9 @@ import time
 
 # Import generated classes
 from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggregator_pb2_grpc
-from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_complete, redis_client
+from utils.utils import compute_image_hash, save_to_redis, is_complete, redis_client
+# face_landmark_server.py
+from utils.face_utils import detect_faces,predict_age_gender_with_padding
 
 
 
@@ -19,8 +21,48 @@ class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
         image_hash = compute_image_hash(request.image_data)
         print(f"Processing age/gender for {request.filename}, hash={image_hash}")
 
-        result = json.dumps({"age": 25, "gender": "male"})  # Fake data
-        save_to_redis(image_hash, 'age_gender', result)
+        # face detection:
+        faces, gray_frame, color_image = detect_faces(request.image_data)
+        if not faces:
+            print("[Age_Gender_Server]: No face detected.")
+            return age_gender_pb2.AgeGenderResponse(
+                success=False,
+                faces=[]
+            )
+        # age-gender predicion
+        predictions = predict_age_gender_with_padding(color_image, faces)
+        if not predictions:
+            print("[Age_Gender_Server]: Prediction failed.")
+            return age_gender_pb2.AgeGenderResponse(
+                success=False,
+                faces=[]
+            )
+        # make resualt ready for sending
+        faces_response = []
+        redis_result = []
+
+        for pred in predictions:
+            age_string = pred["age"]      # مثلاً "25-32"
+            gender = pred["gender"]       # "Male" یا "Female"
+            x1, y1, x2, y2 = pred["box"]
+
+            # اضافه کردن به پاسخ gRPC
+            face_attr = age_gender_pb2.FaceAttributes(
+                estimated_age=age_string,
+                gender=gender.lower(),
+                box=age_gender_pb2.BoundingBox(x1=x1, y1=y1, x2=x2, y2=y2)
+            )
+            faces_response.append(face_attr)
+
+            # آماده‌سازی برای ذخیره‌سازی در Redis
+            redis_result.append({
+                "age": age_string,
+                "gender": gender,
+                "box": [x1, y1, x2, y2]
+            })
+
+        # ذخیره در Redis
+        save_to_redis(image_hash, 'age_gender', json.dumps(redis_result))
 
         if is_complete(image_hash):
             print("[Age_Gender_Server]:  Both landmarks and age/gender available. Sending to Aggregator.")
@@ -32,7 +74,10 @@ class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
                 )
             )
 
-        return age_gender_pb2.AgeGenderResponse(estimated_age=25, gender="male", success=True)
+        return age_gender_pb2.AgeGenderResponse(
+            success=True,
+            faces=faces_response
+)
 
 
 def serve():
