@@ -7,6 +7,14 @@ from generated import age_gender_pb2
 from generated import age_gender_pb2_grpc
 from generated import face_landmark_pb2_grpc
 
+# ------- config.yaml ---------
+from config_loader import config
+config_grpc2_port = config['grpc']["service2"]['port']
+config_grpc3_port = config['grpc']["service3"]['port']
+config_grpc4_port = config['grpc']["service4"]['port']
+# ------- ------------ ---------
+
+
 
 def read_images(folder_path):
     for image_name in os.listdir(folder_path):
@@ -27,8 +35,8 @@ def main():
     folder = "/Users/adib/Desktop/task/task/data"
 
     # gRPC channel to two services
-    landmark_channel = grpc.insecure_channel('localhost:50052')
-    age_gender_channel = grpc.insecure_channel('localhost:50053')
+    landmark_channel = grpc.insecure_channel(f'localhost:{config_grpc2_port}')
+    age_gender_channel = grpc.insecure_channel(f'localhost:{config_grpc3_port}')
 
     landmark_stub = face_landmark_pb2_grpc.FaceLandmarkServiceStub(landmark_channel)
     age_gender_stub = age_gender_pb2_grpc.AgeGenderServiceStub(age_gender_channel)

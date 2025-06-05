@@ -1,14 +1,7 @@
 import time
 
 from utils.logger.logging_config import logger
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s %(levelname)s %(message)s',
-#     filename='app.log',
-#     filemode='w'
-# )
 
-# logger = logging.getLogger(__name__)
 
 
 def log_action_time(action_name):
