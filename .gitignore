@@ -21,6 +21,7 @@ __pycache__/
 
 data/
 output/
+logs/
 *.log
 
 *.env

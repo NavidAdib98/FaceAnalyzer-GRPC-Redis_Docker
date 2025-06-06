@@ -15,8 +15,6 @@ GRPC_SERVICE3_PORT = os.environ.get("GRPC_SERVICE3_PORT", "50053")
 GRPC_SERVICE3_HOST = os.environ.get("GRPC_SERVICE3_HOST", "localhost")
 # ------- --------------------- ---------
 
-
-
 def read_images(folder_path):
     for image_name in os.listdir(folder_path):
         if image_name.lower().endswith(('.jpg', '.jpeg', '.png')):
