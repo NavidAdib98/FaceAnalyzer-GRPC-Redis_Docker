@@ -19,5 +19,8 @@ __pycache__/
 # redis
 *.rdb
 
+data/
 output/
 *.log
+
+*.env

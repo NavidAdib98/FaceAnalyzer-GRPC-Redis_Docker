@@ -1,10 +1,11 @@
+import os
 import logging
 
-# ------- config.yaml ---------
-from config_loader import config
-config_logging_filename = config["logging"]["file"]
-config_logging_level = config["logging"]["level"]
-# ------- ------------ ---------
+# ------- environment variables ---------
+config_logging_filename = os.getenv("LOGGING_FILE", "./app.log")
+config_logging_level = os.getenv("LOGGING_LEVEL", "INFO")
+# ------- --------------------- ---------
+
 
 logging.basicConfig(
     level=getattr(logging,config_logging_level),

@@ -1,16 +1,15 @@
 # utils.py
 import hashlib
 import redis
-import json
+import os
 
-# ------- config.yaml ---------
-from config_loader import config
-config_redis_port = config['redis']['port']
-config_redis_host = config['redis']['host']
-config_redis_db = config['redis']['db']
-# ------- ------------ ---------
+# ------- environment variables ---------
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+REDIS_DB = int(os.environ.get('REDIS_DB', 0))
+# ------- --------------------- ---------
 
-redis_client = redis.Redis(host=config_redis_host, port=config_redis_port, db=config_redis_db)
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
 def compute_image_hash(image_data: bytes) -> str:
     return hashlib.sha256(image_data).hexdigest()
