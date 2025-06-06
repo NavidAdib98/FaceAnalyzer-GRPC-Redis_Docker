@@ -1,7 +1,11 @@
+# age_gender_server.py
+
 import grpc
 import json
-from concurrent import futures
 import time
+import os
+from concurrent import futures
+
 
 # Import generated classes
 from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggregator_pb2_grpc
@@ -11,23 +15,18 @@ from utils.utils import compute_image_hash, save_to_redis, is_complete, redis_cl
 from utils.face_utils import detect_faces,predict_age_gender_with_padding
 from utils.logger.grpc_interceptors import LoggingInterceptor
 
-
-
-
-# ------- config.yaml ---------
-from config_loader import config
-config_grpc3_port = config['grpc']["service3"]['port']
-config_grpc4_port = config['grpc']["service4"]['port']
-config_grpc3_host = config['grpc']["service3"]['host']
-config_grpc4_host = config['grpc']["service4"]['host']
-config_output_dir = config["output"]["dir"]
-# ------- ------------ ---------
+# ------- environment variables ---------
+GRPC_SERVICE3_PORT = os.environ.get('GRPC_SERVICE3_PORT', '50053')
+GRPC_SERVICE3_HOST = os.environ.get('GRPC_SERVICE3_HOST', '0.0.0.0')  # for binding
+GRPC_SERVICE4_PORT = os.environ.get('GRPC_SERVICE4_PORT', '50054')
+GRPC_SERVICE4_HOST = os.environ.get('GRPC_SERVICE4_HOST', 'aggregator_service')
+# ------- --------------------- ---------
 
 
 class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
     def __init__(self):
-        channel = grpc.insecure_channel(f'{config_grpc4_host}:{config_grpc4_port}')  # Aggregator
+        channel = grpc.insecure_channel(f'{GRPC_SERVICE4_HOST}:{GRPC_SERVICE4_PORT}')  # Aggregator
         self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
 
     def Estimate(self, request, context):
@@ -98,8 +97,8 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     age_gender_pb2_grpc.add_AgeGenderServiceServicer_to_server(AgeGenderServiceServicer(), server)
-    server.add_insecure_port(f"{config_grpc3_host}:{config_grpc3_port}")  # listening to port 50053
-    print(f'Starting AgeGenderService server on port {config_grpc3_port}...')
+    server.add_insecure_port(f"{GRPC_SERVICE3_HOST}:{GRPC_SERVICE3_PORT}")  # listening to port 50053
+    print(f'Starting AgeGenderService server on port {GRPC_SERVICE3_PORT}...')
     server.start()
     try:
         while True:

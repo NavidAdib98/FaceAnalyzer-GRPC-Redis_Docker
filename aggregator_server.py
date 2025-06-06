@@ -5,26 +5,23 @@ from concurrent import futures
 import time
 import os
 import json
-from datetime import datetime
-import redis
 import cv2
-
+from datetime import datetime
 
 from generated import aggregator_pb2, aggregator_pb2_grpc
 from utils.utils import get_from_redis
 from utils.face_utils import draw_combined_annotations
 from utils.logger.grpc_interceptors import LoggingInterceptor
 
-# ------- config.yaml ---------
-from config_loader import config
-config_grpc_host = config['grpc']["service4"]['host']
-config_grpc_port = config['grpc']["service4"]['port']
-config_output_dir = config["output"]["dir"]
-# ------- ------------ ---------
+
+# ------- environment variables ---------
+OUTPUT_DIR = os.environ.get('OUTPUT_DIR', './output')
+GRPC_SERVICE4_PORT = os.environ.get('GRPC_SERVICE4_PORT', '50054')
+GRPC_SERVICE4_HOST = os.environ.get('GRPC_SERVICE4_HOST', "0.0.0.0") # for binding
+# ------- --------------------- ---------
 
 
 # Create output directory
-OUTPUT_DIR = config_output_dir
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -71,8 +68,8 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     aggregator_pb2_grpc.add_AggregatorServicer_to_server(AggregatorServicer(), server)
-    server.add_insecure_port(f"{config_grpc_host}:{config_grpc_port}")  # listening to port 50054 
-    print(f"Starting Aggregator server on port {config_grpc_port}...")
+    server.add_insecure_port(f"{GRPC_SERVICE4_HOST}:{GRPC_SERVICE4_PORT}")  # listening to port 50054 
+    print(f"Starting Aggregator server on port {GRPC_SERVICE4_PORT}...")
     server.start()
     try:
         while True:

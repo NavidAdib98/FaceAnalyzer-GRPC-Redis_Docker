@@ -7,12 +7,13 @@ from generated import age_gender_pb2
 from generated import age_gender_pb2_grpc
 from generated import face_landmark_pb2_grpc
 
-# ------- config.yaml ---------
-from config_loader import config
-config_grpc2_port = config['grpc']["service2"]['port']
-config_grpc3_port = config['grpc']["service3"]['port']
-config_grpc4_port = config['grpc']["service4"]['port']
-# ------- ------------ ---------
+# ------- environment variables ---------
+DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
+GRPC_SERVICE2_PORT = os.environ.get("GRPC_SERVICE2_PORT", "50052")
+GRPC_SERVICE2_HOST = os.environ.get("GRPC_SERVICE2_HOST", "localhost")
+GRPC_SERVICE3_PORT = os.environ.get("GRPC_SERVICE3_PORT", "50053")
+GRPC_SERVICE3_HOST = os.environ.get("GRPC_SERVICE3_HOST", "localhost")
+# ------- --------------------- ---------
 
 
 
@@ -32,11 +33,11 @@ def send_to_age_gender(stub, filename, image_data):
     stub.Estimate(request)
 
 def main():
-    folder = "/Users/adib/Desktop/task/task/data"
+    folder = DATA_DIR
 
     # gRPC channel to two services
-    landmark_channel = grpc.insecure_channel(f'localhost:{config_grpc2_port}')
-    age_gender_channel = grpc.insecure_channel(f'localhost:{config_grpc3_port}')
+    landmark_channel = grpc.insecure_channel(f'{GRPC_SERVICE2_HOST}:{GRPC_SERVICE2_PORT}')
+    age_gender_channel = grpc.insecure_channel(f'{GRPC_SERVICE3_HOST}:{GRPC_SERVICE3_PORT}')
 
     landmark_stub = face_landmark_pb2_grpc.FaceLandmarkServiceStub(landmark_channel)
     age_gender_stub = age_gender_pb2_grpc.AgeGenderServiceStub(age_gender_channel)

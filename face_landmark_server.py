@@ -1,7 +1,10 @@
+# face_landmark_server.py
+
 import grpc
 from concurrent import futures
 import time
 import json
+import os
 
 # Import generated classes
 from generated import face_landmark_pb2, face_landmark_pb2_grpc,aggregator_pb2,aggregator_pb2_grpc
@@ -11,19 +14,17 @@ from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_co
 from utils.face_utils import detect_faces,extract_landmarks
 from utils.logger.grpc_interceptors import LoggingInterceptor
 
-# ------- config.yaml ---------
-from config_loader import config
-config_grpc2_port = config['grpc']["service2"]['port']
-config_grpc4_port = config['grpc']["service4"]['port']
-config_grpc2_host = config['grpc']["service2"]['host']
-config_grpc4_host = config['grpc']["service4"]['host']
-config_output_dir = config["output"]["dir"]
-# ------- ------------ ---------
+# ------- environment variables ---------
+GRPC_SERVICE2_PORT = os.environ.get('GRPC_SERVICE2_PORT', '50052')
+GRPC_SERVICE2_HOST = os.environ.get('GRPC_SERVICE2_HOST', '0.0.0.0')  # for binding
+GRPC_SERVICE4_PORT = os.environ.get('GRPC_SERVICE4_PORT', '50054')
+GRPC_SERVICE4_HOST = os.environ.get('GRPC_SERVICE4_HOST', 'aggregator_service')
+# ------- --------------------- ---------
 
 class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServicer):
 
     def __init__(self):
-            channel = grpc.insecure_channel(f'{config_grpc4_host}:{config_grpc4_port}')  # Aggregator
+            channel = grpc.insecure_channel(f'{GRPC_SERVICE4_HOST}:{GRPC_SERVICE4_PORT}')  # Aggregator
             self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
             
     def DetectLandmarks(self, request, context):
@@ -56,8 +57,8 @@ def serve():
                          interceptors=[LoggingInterceptor()]
                          )
     face_landmark_pb2_grpc.add_FaceLandmarkServiceServicer_to_server(FaceLandmarkServiceServicer(), server)
-    server.add_insecure_port(f"{config_grpc2_host}:{config_grpc2_port}")  # listening to port 50052 
-    print(f"Face Landmark Service running on port {config_grpc2_port}...")
+    server.add_insecure_port(f"{GRPC_SERVICE2_HOST}:{GRPC_SERVICE2_PORT}")  # listening to port 50052 
+    print(f"Face Landmark Service running on port {GRPC_SERVICE2_PORT}...")
     server.start()
     try:
         while True:
