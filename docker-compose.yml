@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  face_landmark_server:
+    build: .
+    container_name: face_landmark_server
+    env_file: .env
+    environment:
+      - GRPC_SERVICE2_HOST=0.0.0.0
+      - GRPC_SERVICE4_HOST=aggregator_server
+      - REDIS_HOST=redis
+    volumes:
+      - ./logs/landmark:/app/logs
+    command: python /app/face_landmark_server.py
+    depends_on:
+      - redis
+
+  age_gender_server:
+    build: .
+    container_name: age_gender_server
+    env_file: .env
+    environment:
+      - GRPC_SERVICE3_HOST=0.0.0.0
+      - GRPC_SERVICE4_HOST=aggregator_server
+      - REDIS_HOST=redis
+    volumes:
+      - ./logs/age_gender:/app/logs
+    command: python /app/age_gender_server.py
+    depends_on:
+      - redis
+
+  aggregator_server:
+    build: .
+    container_name: aggregator_server
+    env_file: .env
+    environment:
+      - GRPC_SERVICE4_HOST=0.0.0.0
+      - REDIS_HOST=redis
+    volumes:
+      - ./output:/app/output
+      - ./logs/aggregator:/app/logs
+    command: python /app/aggregator_server.py
+    depends_on:
+      - redis
+      - face_landmark_server
+      - age_gender_server
+
+  image_input:
+    build: .
+    container_name: image_input
+    env_file: .env
+    environment:
+      - GRPC_SERVICE2_HOST=face_landmark_server
+      - GRPC_SERVICE3_HOST=age_gender_server
+      - GRPC_SERVICE4_HOST=aggregator_server
+      - REDIS_HOST=redis
+    depends_on:
+      - face_landmark_server
+      - age_gender_server
+      - aggregator_server
+    command: python /app/image_input.py
