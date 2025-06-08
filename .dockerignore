@@ -1,0 +1,28 @@
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 
+.env
+*.log
+
+# دایرکتوری‌های خروجی و لاگ
+logs/
+output/
+data/
+__outputs__/
+tmp/
+temp/
+checkpoints/
+
+# 
+.DS_Store
+Thumbs.db
+dump.rdb
+
+# virtual environment
+venv/
+.env/
+face_detection_venv/
