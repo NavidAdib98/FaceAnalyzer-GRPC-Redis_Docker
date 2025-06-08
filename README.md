@@ -80,7 +80,13 @@ Edit the `app/config.yaml` file to define:
 
 ## 📦 Models
 
-Due to GitHub file size limitations, the model files (e.g., `shape_predictor_68_face_landmarks.dat`, CNN models, etc.) are **not included** in the repository.
+Due to GitHub file size limitations, the model files are **not included** in the repository.
 
-> 🔽 **You must manually download the required model files** and place them in the `app/models/` directory.
+Please manually download and place the following files:
+
+- `shape_predictor_68_face_landmarks.dat` → `app/models/`
+- `age_net.caffemodel` → `app/models/age-model/`
+- `gender_net.caffemodel` → `app/models/gender-model/`
+
+Make sure the directories `age-model` and `gender-model` exist inside the `models` folder.
 
