@@ -78,6 +78,11 @@ Edit the `app/config.yaml` file to define:
 - Images with detected faces, landmarks, and annotations for age/gender
 - A corresponding `.json` file per image with detailed analysis
 
+<h2>Examples :</h2>
+    
+<img src="example/SingleFace.jpg_1550cfb2bbf1deba53539684230dfcac10933bd37fcaacc6ef0a663cb8592eb0.jpg">
+<img src="example/MultipleFaces.jpg_1e9d7f27def820bfa538fbff1175826275cd392ac63d222d23b4f2cd16fb1661.jpg">
+
 ## 📦 Models
 
 Due to GitHub file size limitations, the model files are **not included** in the repository.
