@@ -1,119 +1,86 @@
-# [Project Name]
+# Face Analyzer (GRPC + Redis Version without Docker)
 
-This version of the project runs without Docker.  
-All source code is located inside the `app/` folder.
+This project is a facial image analyzer pipeline that uses gRPC services and Redis for fast memory sharing. It processes images to detect faces, extract facial landmarks, and estimate age and gender. The final output includes annotated images and structured JSON data describing detected attributes.
 
----
+## 🔧 Prerequisites
 
-## Project Structure
-
-```
-project/
-└── app/
-    ├── image-input.py           # Main script that reads input images and sends them to services
-    ├── face_landmark_server.py # Service for face landmark detection (uses GRPC and Redis)
-    ├── age_gender_server.py    # Service for age and gender detection (uses GRPC and Redis)
-    ├── aggregator_server.py    # Final aggregator service that collects results
-    ├── config.yaml             # Configuration file for input/output paths
-    └── requirements.txt        # Project dependencies
-```
-
----
-
-## Overview
-
-- First, start the two services `face_landmark_server.py` and `age_gender_server.py`.
-- Then start the `aggregator_server.py` service.
-- Finally, run `image-input.py` which reads the input images and sends requests to the services.
-- Input images should be placed in a folder, and the folder path should be specified in `config.yaml`.
-- Output files will be saved to the output path specified in `config.yaml`.
-- For each processed image, a JSON file will be created containing face bounding box, landmarks, age, and gender information.
-
----
-
-## Prerequisites
-
-1. **Create and activate a virtual environment (recommended):**
+- Python 3.8+
+- `cmake` (required for `dlib`)
+- Redis server running locally
+- Virtual environment (recommended)
+- Required Python packages:
 
 ```bash
 python -m venv venv
-source venv/bin/activate      # On Windows: venv\Scripts\activate
+source venv/bin/activate     # On Windows use venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-2. **Install dependencies:**
+> ⚠️ `dlib` requires CMake to be installed. On Ubuntu: `sudo apt install cmake`, on macOS: `brew install cmake`.
 
-```bash
-pip install -r app/requirements.txt
+## 📁 Directory Structure
+
+```
+app/
+├── aggregator_server.py
+├── face_landmark_server.py
+├── age_gender_server.py
+├── image_input.py
+├── config.yaml
+├── models/   <-- You must download the required model files manually
 ```
 
-> ⚠️ **Important:**  
-> The `dlib` library requires `cmake` to be installed on your system before installation.  
-> - On Ubuntu, install cmake with:  
->   ```bash
->   sudo apt-get install cmake
->   ```  
-> - On Windows, download and install cmake from the official website.
+## 🚀 Execution Order
 
----
+Make sure Redis is running first.
 
-## Configuration (`config.yaml`)
+Then, run the services in the following order **in separate terminals**:
 
-Specify the input and output directories in `app/config.yaml`:
+1. **Aggregator Service**  
+   Handles final collection and storage of output data.
 
-```yaml
-input_folder: "/path/to/input/images"
-output_folder: "/path/to/output/folder"
-```
+   ```bash
+   python app/aggregator_server.py
+   ```
 
----
+2. **Face Landmark Service**  
+   Detects faces and extracts landmark points.
 
-## Running the Project
+   ```bash
+   python app/face_landmark_server.py
+   ```
 
-1. Start the face landmark detection service:
+3. **Age & Gender Service**  
+   Estimates age and gender based on face crops.
 
-```bash
-python app/face_landmark_server.py
-```
+   ```bash
+   python app/age_gender_server.py
+   ```
 
-2. Start the age and gender detection service:
+4. **Image Input Script**  
+   Feeds input images and coordinates the pipeline.
 
-```bash
-python app/age_gender_server.py
-```
+   ```bash
+   python app/image_input.py
+   ```
 
-3. Start the aggregator service:
+## ⚙️ Configuration
 
-```bash
-python app/aggregator_server.py
-```
+Edit the `app/config.yaml` file to define:
 
-4. Finally, run the main image input script to process images:
+- Input image folder path
+- Output folder for:
+  - Annotated images
+  - Output `.json` files
 
-```bash
-python app/image-input.py
-```
+## 🧠 Output
 
----
+- Images with detected faces, landmarks, and annotations for age/gender
+- A corresponding `.json` file per image with detailed analysis
 
-## Output
+## 📦 Models
 
-- Processed images with detected faces and landmarks will be saved in the output folder.
-- A JSON file for each image containing face bounding boxes, landmarks, age, and gender information will also be generated.
+Due to GitHub file size limitations, the model files (e.g., `shape_predictor_68_face_landmarks.dat`, CNN models, etc.) are **not included** in the repository.
 
----
-
-## Notes
-
-- For easier setup and dependency management, especially for running multiple services and Redis, consider using the Dockerized version of this project available in the other branch.
-
----
-
-## Common Issues
-
-- If you encounter problems installing `dlib`, make sure you have installed `cmake` and a C++ compiler (e.g., `build-essential` on Linux).
-- Ensure that Redis server is running on your system (or via Docker if applicable).
-
----
-
-If you want, I can also prepare the README for the Docker branch.
+> 🔽 **You must manually download the required model files** and place them in the `app/models/` directory.
 
