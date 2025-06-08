@@ -82,6 +82,7 @@ Edit the `app/config.yaml` file to define:
     
 <img src="example/SingleFace.jpg_1550cfb2bbf1deba53539684230dfcac10933bd37fcaacc6ef0a663cb8592eb0.jpg">
 <img src="example/MultipleFaces.jpg_1e9d7f27def820bfa538fbff1175826275cd392ac63d222d23b4f2cd16fb1661.jpg">
+Warning: Sometimes the model can be a bit cheeky and mistake gender—don’t worry, it’s just having a little fun! 😄
 
 ## 📦 Models
 
