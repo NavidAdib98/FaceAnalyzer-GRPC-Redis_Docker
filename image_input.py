@@ -9,6 +9,8 @@ from generated import age_gender_pb2
 from generated import age_gender_pb2_grpc
 from generated import face_landmark_pb2_grpc
 
+from utils.grpc_health_check import wait_for_grpc
+
 # ------- environment variables ---------
 DATA_DIR = os.environ.get("DATA_DIR", "/app/data")
 GRPC_SERVICE2_PORT = os.environ.get("GRPC_SERVICE2_PORT", "50052")
@@ -32,15 +34,16 @@ def send_to_age_gender(stub, filename, image_data):
     request = age_gender_pb2.AgeImageRequest(filename=filename, image_data=image_data)
     stub.Estimate(request)
 
+
 def main():
     folder = DATA_DIR
 
-    waittime = 10 
-    print(f"wating for: {waittime} s")
-    time.sleep(waittime)
+    # waittime = 10 
+    # print(f"wating for: {waittime} s")
+    # time.sleep(waittime)
     # gRPC channel to two services
-    landmark_channel = grpc.insecure_channel(f'{GRPC_SERVICE2_HOST}:{GRPC_SERVICE2_PORT}')
-    age_gender_channel = grpc.insecure_channel(f'{GRPC_SERVICE3_HOST}:{GRPC_SERVICE3_PORT}')
+    landmark_channel = wait_for_grpc(GRPC_SERVICE2_HOST, GRPC_SERVICE2_PORT)
+    age_gender_channel = wait_for_grpc(GRPC_SERVICE3_HOST, GRPC_SERVICE3_PORT)
 
     landmark_stub = face_landmark_pb2_grpc.FaceLandmarkServiceStub(landmark_channel)
     age_gender_stub = age_gender_pb2_grpc.AgeGenderServiceStub(age_gender_channel)

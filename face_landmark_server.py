@@ -13,6 +13,7 @@ from utils.utils import compute_image_hash, save_to_redis, get_from_redis, is_co
 # Import utils
 from utils.face_utils import detect_faces,extract_landmarks
 from utils.logger.grpc_interceptors import LoggingInterceptor
+from utils.grpc_health_check import wait_for_grpc
 
 # ------- environment variables ---------
 GRPC_SERVICE2_PORT = os.environ.get('GRPC_SERVICE2_PORT', '50052')
@@ -24,7 +25,7 @@ GRPC_SERVICE4_HOST = os.environ.get('GRPC_SERVICE4_HOST', 'aggregator_service')
 class FaceLandmarkServiceServicer(face_landmark_pb2_grpc.FaceLandmarkServiceServicer):
 
     def __init__(self):
-            channel = grpc.insecure_channel(f'{GRPC_SERVICE4_HOST}:{GRPC_SERVICE4_PORT}')  # Aggregator
+            channel = wait_for_grpc(GRPC_SERVICE4_HOST, GRPC_SERVICE4_PORT)# Aggregator
             self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
             
     def DetectLandmarks(self, request, context):

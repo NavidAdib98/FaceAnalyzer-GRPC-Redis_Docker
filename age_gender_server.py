@@ -14,6 +14,7 @@ from generated import age_gender_pb2, age_gender_pb2_grpc,aggregator_pb2, aggreg
 from utils.utils import compute_image_hash, save_to_redis, is_complete, redis_client
 from utils.face_utils import detect_faces,predict_age_gender_with_padding
 from utils.logger.grpc_interceptors import LoggingInterceptor
+from utils.grpc_health_check import wait_for_grpc
 
 # ------- environment variables ---------
 GRPC_SERVICE3_PORT = os.environ.get('GRPC_SERVICE3_PORT', '50053')
@@ -26,7 +27,7 @@ GRPC_SERVICE4_HOST = os.environ.get('GRPC_SERVICE4_HOST', 'aggregator_service')
 class AgeGenderServiceServicer(age_gender_pb2_grpc.AgeGenderServiceServicer):
 
     def __init__(self):
-        channel = grpc.insecure_channel(f'{GRPC_SERVICE4_HOST}:{GRPC_SERVICE4_PORT}')  # Aggregator
+        channel = wait_for_grpc(GRPC_SERVICE4_HOST, GRPC_SERVICE4_PORT)# Aggregator
         self.aggregator_stub = aggregator_pb2_grpc.AggregatorStub(channel)
 
     def Estimate(self, request, context):
