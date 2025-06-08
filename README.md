@@ -8,6 +8,7 @@ This project implements a facial image analysis pipeline using gRPC services and
 
 - Docker (version 20+ recommended)
 - Docker Compose
+- 🚫 Don't like Docker? No worries — the master branch runs perfectly without it! 🎉
 
 ### Setup & Run
 
