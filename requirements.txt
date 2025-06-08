@@ -1,6 +1,5 @@
 async-timeout==5.0.1
 dlib==20.0.0
-face-alignment==1.4.1
 filelock==3.16.1
 fsspec==2025.3.0
 grpcio==1.70.0
@@ -28,7 +27,6 @@ scipy==1.10.1
 setuptools==49.2.1
 sympy==1.13.3
 tifffile==2023.7.10
-torch==2.2.2
 tqdm==4.67.1
 typing_extensions==4.13.2
 zipp==3.20.2

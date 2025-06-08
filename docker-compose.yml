@@ -5,7 +5,7 @@ services:
     image: redis:7
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     restart: unless-stopped
 
   face_landmark_server:
@@ -61,6 +61,8 @@ services:
       - GRPC_SERVICE3_HOST=age_gender_server
       - GRPC_SERVICE4_HOST=aggregator_server
       - REDIS_HOST=redis
+    volumes:
+      - ./data:/app/data
     depends_on:
       - face_landmark_server
       - age_gender_server

@@ -1,4 +1,6 @@
-import os, sys
+import os
+import time
+import sys
 import grpc
 from pathlib import Path
 
@@ -33,6 +35,9 @@ def send_to_age_gender(stub, filename, image_data):
 def main():
     folder = DATA_DIR
 
+    waittime = 10 
+    print(f"wating for: {waittime} s")
+    time.sleep(waittime)
     # gRPC channel to two services
     landmark_channel = grpc.insecure_channel(f'{GRPC_SERVICE2_HOST}:{GRPC_SERVICE2_PORT}')
     age_gender_channel = grpc.insecure_channel(f'{GRPC_SERVICE3_HOST}:{GRPC_SERVICE3_PORT}')
