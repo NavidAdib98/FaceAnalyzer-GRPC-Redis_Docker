@@ -23,5 +23,3 @@ data/
 output/
 logs/
 *.log
-
-*.env
