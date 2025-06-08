@@ -110,18 +110,16 @@ output_images/
 └── GroupPhoto.json
 ```
 
-### 📷 Sample Input/Output
+## 🧠 Output
 
-**Input:**
+- Images with detected faces, landmarks, and annotations for age/gender
+- A corresponding `.json` file per image with detailed analysis
 
-<img src="example/SingleFace.jpg_1550cfb2bbf1deba53539684230dfcac10933bd37fcaacc6ef0a663cb8592eb0.jpg" width="300">
-
-**Output:**
-
-<img src="example/MultipleFaces.jpg_1e9d7f27def820bfa538fbff1175826275cd392ac63d222d23b4f2cd16fb1661.jpg" width="300">
-
-> 😄 Sometimes the model gets playful and guesses the wrong gender—don't take it personally!
-
+<h2>Examples :</h2>
+    
+<img src="example/SingleFace.jpg_1550cfb2bbf1deba53539684230dfcac10933bd37fcaacc6ef0a663cb8592eb0.jpg">
+<img src="example/MultipleFaces.jpg_1e9d7f27def820bfa538fbff1175826275cd392ac63d222d23b4f2cd16fb1661.jpg">
+Warning: Sometimes the model can be a bit cheeky and mistake gender—don’t worry, it’s just having a little fun! 😄
 ---
 
 ## 📝 Notes
